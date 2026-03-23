@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(candlelight LANGUAGES CXX)
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
 

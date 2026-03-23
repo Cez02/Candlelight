@@ -25,7 +25,7 @@ typedef std::shared_ptr<Application> HApplication;
 
 HApplication CreateApplication(HINSTANCE hInstance, AppStartupSettings settings);
 
-void BeginLoop(HApplication application);
+void BeginLoop(const HApplication &application);
 
 }
 

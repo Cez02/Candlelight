@@ -1,9 +1,10 @@
-#include "render_pipeline.h"
+#include "RenderPipeline.h"
 
-#include "helpers.h"
 #include <glm/glm.hpp>
 
-namespace candle 
+#include "DebugTools.h"
+
+namespace candle::rendering
 {
 
     ComPtr<ID3D12RootSignature> RenderPipeline::CreateRootSignature(ComPtr<ID3D12Device> device){
@@ -28,16 +29,23 @@ namespace candle
 
         HRESULT serializerResult = D3D12SerializeVersionedRootSignature(&rsDesc, &pSerializedRs, &errorMessage);
 
-        ShoutAndThrowIfFailed(serializerResult, errorMessage);
+        core::DebugTools::AssertAndThrow(serializerResult, static_cast<const char*>(errorMessage->GetBufferPointer()));
 
         ComPtr<ID3D12RootSignature> result;
 
-        ThrowIfFailed(device->CreateRootSignature(0,
+        core::DebugTools::AssertAndThrow(device->CreateRootSignature(0,
                                                   pSerializedRs->GetBufferPointer(),
                                                   pSerializedRs->GetBufferSize(),
-                                                  IID_PPV_ARGS(&result)));
+                                                  IID_PPV_ARGS(&result)),
+                                                  "Failed to create a root signature!");
 
         return result;
+    }
+
+    RenderPipeline::RenderPipeline(RenderingContext ctx)
+        : BaseObject(ctx)
+    {
+
     }
 
     inline D3D12_INPUT_LAYOUT_DESC RenderPipeline::CreateInputLayout(){
@@ -114,7 +122,7 @@ namespace candle
         desc.NodeMask = 0;
         desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-        ThrowIfFailed(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&result)));
+        core::DebugTools::AssertAndThrow(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&result)), "Failed to create a graphics pipeline state!");
         return result;
     }
 

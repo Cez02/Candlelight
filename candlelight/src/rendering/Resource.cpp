@@ -1,8 +1,8 @@
-#include "resource.h"
+#include "Resource.h"
 
-#include "helpers.h"
+#include "DebugTools.h"
 
-namespace candle {
+namespace candle::rendering  {
 
 
     void Resource::Init(ComPtr<ID3D12Device> device, const size_t bytes, D3D12_HEAP_TYPE type, D3D12_RESOURCE_STATES initialState)
@@ -27,7 +27,8 @@ namespace candle {
         resourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
 
-        ThrowIfFailed(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialState, 0, IID_PPV_ARGS(&m_Resource)));
+        core::DebugTools::AssertAndThrow(device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialState, 0, IID_PPV_ARGS(&m_Resource)),
+            "Failed to create a commited resource!");
     }
 
     ComPtr<ID3D12Resource> Resource::GetResource() {

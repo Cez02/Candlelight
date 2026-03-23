@@ -3,17 +3,17 @@
 #include <candlelight_types.h>
 
 #include <chrono>
-#include "application.h"
+#include "Application.h"
 
-#include "utils.h"
+#include "Logger.h"
+#include "WindowsUtils.h"
 
 using namespace candle;
-
+using namespace candle::core;
 using namespace Microsoft::WRL;
 
-void candle::Application::RegisterWindowClass(const wchar_t* windowClassName)
-{
-    std::cout << "Registering window class" << std::endl;
+void Application::RegisterWindowClass(const wchar_t* windowClassName) const {
+    Logger::Log(LogType::Info, "Registering window class");
 
     // Register a window class for creating our render window with.
     WNDCLASSEXW windowClass = {};
@@ -23,13 +23,13 @@ void candle::Application::RegisterWindowClass(const wchar_t* windowClassName)
     windowClass.lpfnWndProc = &Application::WndProc;
     windowClass.cbClsExtra = 0;
     windowClass.cbWndExtra = 0;
-    windowClass.hInstance = m_hInst;
-    windowClass.hIcon = ::LoadIcon(m_hInst, NULL);
+    windowClass.hInstance = m_Context.GetHINSTANCE();
+    windowClass.hIcon = ::LoadIcon(m_Context.GetHINSTANCE(), NULL);
     windowClass.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     windowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     windowClass.lpszMenuName = NULL;
     windowClass.lpszClassName = windowClassName;
-    windowClass.hIconSm = ::LoadIcon(m_hInst, NULL);
+    windowClass.hIconSm = ::LoadIcon(m_Context.GetHINSTANCE(), NULL);
 
     static ATOM atom = ::RegisterClassExW(&windowClass);
     assert(atom > 0);
@@ -64,7 +64,7 @@ HWND candle::Application::CreateWindow(const wchar_t* windowClassName
         windowHeight,
         NULL,
         NULL,
-        m_hInst,
+        m_Context.GetHINSTANCE(),
         this
     );
 
@@ -134,7 +134,7 @@ LRESULT CALLBACK Application::WndProc(HWND hwnd, UINT message, WPARAM wParam, LP
         case WM_SIZE:
         {
             RECT clientRect = {};
-            ::GetClientRect(application->getHWnd(), &clientRect);
+            ::GetClientRect(application->GetContext().GetHWND(), &clientRect);
 
             int width = clientRect.right - clientRect.left;
             int height = clientRect.bottom - clientRect.top;
@@ -160,27 +160,33 @@ void candle::Application::Init(HINSTANCE hInstance, uint clientWidth, uint clien
     // be rendered in a DPI sensitive fashion.
     SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-    std::cout << "Creating window name" << std::endl;
+    core::Logger::Initialize("MasterLogger", "logger.log");
 
     // Window class name. Used for registering / creating the window.
     const wchar_t* windowClassName = L"DX12WindowClass";
 
-    std::cout << "Creating window name" << std::endl;
+    m_Context.UnlockContext();
 
-    m_hInst = hInstance;
+    m_Context.InitializeResolver();
+    m_Context.SetHINSTANCE(hInstance);
 
-    std::cout << "Registering a window..." << std::endl;
+    Logger::Log(LogType::Info, "Registering window...");
 
     RegisterWindowClass(windowClassName);
 
-    std::cout << "Creating a window..." << std::endl;
+    Logger::Log(LogType::Info, "Creating window...");
 
-    m_hWnd = CreateWindow(windowClassName, windowTitle, clientWidth, clientHeight);
+    m_Context.SetHWND(CreateWindow(windowClassName, windowTitle, clientWidth, clientHeight));
+    m_Context.LockContext();
 
-    std::cout << "Initializing renderer..." << std::endl;
+    Logger::Log(LogType::Info, "Initializing renderer...");
 
-    m_Renderer = std::make_shared<Renderer>();
-    m_Renderer->Init(m_hWnd, clientWidth, clientHeight, false);
+    m_Renderer = std::make_shared<Renderer>(m_Context);
+    m_Context.GetResolver()->Register(m_Renderer);
+
+    m_Renderer->Init({
+        clientWidth, clientHeight, false
+    });
 
     m_IsInitialized = true;
 }
@@ -215,8 +221,7 @@ void candle::Application::Update()
     }
 }
 
-void candle::Application::Render()
-{
+void candle::Application::Render() const {
     m_Renderer->Render();
 }
 
@@ -228,25 +233,20 @@ candle::Application::~Application(){
 
     // TODO
 
-}
-
-HWND candle::Application::getHWnd()
-{
-    return m_hWnd;
+    core::Logger::Deinitialize();
 }
 
 HApplication candle::CreateApplication(HINSTANCE hInstance, AppStartupSettings settings){
-
     HApplication application = std::make_shared<Application>();
 
-    application->Init(hInstance, settings.m_ClientWidth, settings.m_ClientWidth, L"Example title");
+    application->Init(hInstance, settings.m_ClientWidth, settings.m_ClientWidth, L"Temporary title");
 
     return application;
 }
 
-void candle::BeginLoop(HApplication application){
+void candle::BeginLoop(const HApplication &application){
 
-    ::ShowWindow(application->getHWnd(), SW_SHOW);
+    ::ShowWindow(application->GetContext().GetHWND(), SW_SHOW);
 
     MSG msg = {};
     while (msg.message != WM_QUIT)

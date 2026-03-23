@@ -1,9 +1,9 @@
-add_library(candlelight src/resource.cpp src/resource.h src/debug.cpp src/debug.h)
+add_library(candlelight)
 
 add_subdirectory(shaders)
 
 add_dependencies(candlelight
-        candlelight_shaders
+    candlelight_shaders
 )
 
 target_include_directories(candlelight
