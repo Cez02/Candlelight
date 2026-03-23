@@ -4,6 +4,6 @@ target_include_directories(candlelight_core
 )
 
 target_sources(candlelight_core
-    PUBLIC
+    PRIVATE
         DebugTools.cpp
 )

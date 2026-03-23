@@ -11,8 +11,6 @@ using namespace Microsoft::WRL;
 #include <dxgi1_6.h>
 #include <DirectXMath.h>
 
-#include "WindowsUtils.h"
-
 
 using namespace candle::rendering;
 using namespace candle::core;
@@ -123,23 +121,23 @@ uint64_t CommandQueue::Signal()
     return fenceValueForSignal;
 }
 
-bool candle::CommandQueue::IsFenceComplete(uint64_t fenceValue) const {
+bool CommandQueue::IsFenceComplete(uint64_t fenceValue) const {
     return m_d3d12Fence->GetCompletedValue() >= fenceValue;
 }
 
-void candle::CommandQueue::WaitForFenceValue(uint64_t fenceValue) const {
+void CommandQueue::WaitForFenceValue(uint64_t fenceValue) const {
     if(!IsFenceComplete(fenceValue)){
         m_d3d12Fence->SetEventOnCompletion(fenceValue, m_FenceEvent);
         ::WaitForSingleObject(m_FenceEvent, DWORD_MAX);
     }
 }
 
-void candle::CommandQueue::Flush()
+void CommandQueue::Flush()
 {
     WaitForFenceValue(Signal());
 }
 
-Microsoft::WRL::ComPtr<ID3D12CommandQueue> candle::CommandQueue::GetD3D12CommandQueue() const
+Microsoft::WRL::ComPtr<ID3D12CommandQueue> CommandQueue::GetD3D12CommandQueue() const
 {
     return m_d3d12CommandQueue;
 }

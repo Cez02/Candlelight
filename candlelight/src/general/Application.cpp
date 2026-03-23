@@ -6,7 +6,6 @@
 #include "Application.h"
 
 #include "Logger.h"
-#include "WindowsUtils.h"
 
 using namespace candle;
 using namespace candle::core;
@@ -181,8 +180,8 @@ void candle::Application::Init(HINSTANCE hInstance, uint clientWidth, uint clien
 
     Logger::Log(LogType::Info, "Initializing renderer...");
 
-    m_Renderer = std::make_shared<Renderer>(m_Context);
-    m_Context.GetResolver()->Register(m_Renderer);
+    m_Renderer = std::make_shared<rendering::Renderer>(m_Context);
+    m_Context.GetResolver()->Register<rendering::Renderer>(m_Renderer);
 
     m_Renderer->Init({
         clientWidth, clientHeight, false
@@ -251,7 +250,8 @@ void candle::BeginLoop(const HApplication &application){
     MSG msg = {};
     while (msg.message != WM_QUIT)
     {
-        std::cout << "Loop" << std::endl;
+        Logger::Log(LogType::Info, "Looping");
+
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             ::TranslateMessage(&msg);

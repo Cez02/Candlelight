@@ -6,6 +6,8 @@ using namespace Microsoft::WRL;
 
 #include "../rendering/Renderer.h"
 
+#include "WindowsUtils.h"
+
 #if defined(CreateWindow)
 #undef CreateWindow
 #endif
@@ -20,7 +22,7 @@ namespace candle
         core::BaseContext m_Context = {};
 
         // Modules
-        HRenderer m_Renderer;
+        rendering::HRenderer m_Renderer;
 
         // Data
         bool m_IsInitialized = false;
@@ -31,7 +33,7 @@ namespace candle
                          ,const wchar_t* windowTitle
                          ,uint32_t width
                          ,uint32_t height);
-        static LRESULT CALLBACK Application::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+        static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     public:
         void Init(HINSTANCE hInstance

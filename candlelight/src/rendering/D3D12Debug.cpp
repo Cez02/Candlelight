@@ -1,5 +1,6 @@
 #include "D3D12Debug.h"
 
+#include <dxgi1_3.h>
 #include <vector>
 
 #include "DebugTools.h"
@@ -17,7 +18,7 @@ namespace candle::rendering {
         }
 
         if (!m_IDXGIInstance.Get()) {
-            DebugTools::AssertAndThrow(DXGIGetDebugInterface(IID_PPV_ARGS(&m_IDXGIInstance)), "Failed to get DXGI instance!");
+            DebugTools::AssertAndThrow(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&m_IDXGIInstance)), "Failed to get DXGI instance!");
         }
     }
 

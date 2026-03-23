@@ -5,6 +5,7 @@
 #include <wrl.h>
 
 #include "BaseObject.h"
+#include "RenderingContext.h"
 
 using namespace Microsoft::WRL;
 
@@ -15,8 +16,6 @@ using namespace candle::core;
 
 namespace candle::rendering
 {
-    class RenderingContext;
-
     class CommandQueue : public BaseObject<RenderingContext> {
     public:
         CommandQueue(RenderingContext ctx, D3D12_COMMAND_LIST_TYPE type);

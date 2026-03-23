@@ -2,6 +2,7 @@
 
 #include <wrl.h>
 
+#include "candlelight_types.h"
 #include "RenderingContext.h"
 #include "architecture/BaseObject.h"
 using namespace Microsoft::WRL;
@@ -15,7 +16,6 @@ using namespace Microsoft::WRL;
 #include <glm/glm.hpp>
 
 #include "CommandQueue.h"
-#include "candlelight_types.h"
 #include "RenderPipeline.h"
 #include "Resource.h"
 #include "D3D12Debug.h"

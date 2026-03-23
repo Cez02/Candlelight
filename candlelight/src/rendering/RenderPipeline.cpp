@@ -29,7 +29,10 @@ namespace candle::rendering
 
         HRESULT serializerResult = D3D12SerializeVersionedRootSignature(&rsDesc, &pSerializedRs, &errorMessage);
 
-        core::DebugTools::AssertAndThrow(serializerResult, static_cast<const char*>(errorMessage->GetBufferPointer()));
+        core::DebugTools::AssertAndThrow(serializerResult,
+            errorMessage == NULL
+                ? "No error."
+                : static_cast<const char*>(errorMessage->GetBufferPointer()));
 
         ComPtr<ID3D12RootSignature> result;
 

@@ -437,7 +437,7 @@ void Renderer::Render() {
 
         UINT syncInterval = 1;
         UINT presentFlags = 0;
-        DebugTools::AssertAndThrow(m_RenderingContext.GetSwapChain()->Present(syncInterval, presentFlags));
+        DebugTools::AssertAndThrow(m_RenderingContext.GetSwapChain()->Present(syncInterval, presentFlags), "Failed to present swapchain!");
 
         m_CurrentBackBufferIndex = m_RenderingContext.GetSwapChain()->GetCurrentBackBufferIndex();
 

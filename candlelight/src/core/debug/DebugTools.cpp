@@ -5,7 +5,7 @@
 #include "Logger.h"
 
 namespace candle::core {
-    void DebugTools::AssertAndLog(bool condition, const std::string &errorMessage, void(*assertFailedCallback)) {
+    void DebugTools::AssertAndLog(bool condition, const std::string &errorMessage, void(*assertFailedCallback)()) {
         if (condition)
             return;
 
@@ -16,7 +16,7 @@ namespace candle::core {
         }
     }
 
-    void DebugTools::AssertAndThrow(bool condition, const std::string &errorMessage, void(*assertFailedCallback)) {
+    void DebugTools::AssertAndThrow(bool condition, const std::string &errorMessage, void(*assertFailedCallback)()) {
         if (condition)
             return;
 
@@ -28,7 +28,7 @@ namespace candle::core {
         throw std::runtime_error(errorMessage);
     }
 
-    void DebugTools::AssertAndLog(HRESULT result, const std::string &errorMessage, void *assertFailedCallback) {
+    void DebugTools::AssertAndLog(HRESULT result, const std::string &errorMessage, void(*assertFailedCallback)()) {
         if (!result)
             return;
 
@@ -39,7 +39,7 @@ namespace candle::core {
         }
     }
 
-    void DebugTools::AssertAndThrow(HRESULT result, const std::string &errorMessage, void *assertFailedCallback) {
+    void DebugTools::AssertAndThrow(HRESULT result, const std::string &errorMessage, void(*assertFailedCallback)()) {
         if (!result)
             return;
 
