@@ -22,12 +22,16 @@ namespace candle::core {
         switch (logType) {
             case LogType::Info:
                 s_Instance->m_Logger->info(logMessage);
+                spdlog::info(logMessage);
                 return;
             case LogType::Warning:
                 s_Instance->m_Logger->warn(logMessage);
+                spdlog::warn(logMessage);
                 return;
             case LogType::Error:
                 s_Instance->m_Logger->error(logMessage);
+                spdlog::error(logMessage);
+                return;
         }
     }
 

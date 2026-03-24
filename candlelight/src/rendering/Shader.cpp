@@ -1,16 +1,15 @@
 #include "Shader.hpp"
 #include <fstream>
 #include <string>
-#include <iostream>
 #include <filesystem>
 
 #include <d3dcompiler.h>
 #include <dxcapi.h>
 
+#include "Logger.h"
 
 namespace candle::rendering
 {
-
     const wchar_t* ChooseShaderTarget(const ShaderType shaderType){
 
         switch(shaderType){
@@ -20,14 +19,15 @@ namespace candle::rendering
                 return L"ps_6_0";
         }
 
-        std::cerr << "Unrecognized shader target type " << (int)shaderType << std::endl;
+        core::Logger::Log(core::LogType::Error, std::format("Unrecognized shader target type {}", (int)shaderType));
+
         return L"vs_6_0";
     }
 
 
     void Shader::Init(std::string shaderSourceFilePath, const ShaderType shaderType){
 
-        std::cout << "Compiling shader " << shaderSourceFilePath << std::endl;
+        core::Logger::Log(core::LogType::Info, std::format("Compiling shader {}", shaderSourceFilePath));
 
         // prepare compilation tools
         ComPtr<IDxcUtils> utils;
@@ -59,7 +59,8 @@ namespace candle::rendering
 
         std::vector<LPCWSTR> args = {
             L"-E", L"main",        // entry point
-            L"-T", ChooseShaderTarget(shaderType)        // shader model
+            L"-T", ChooseShaderTarget(shaderType),        // shader model,
+            L"-Wno-null-character"
     #ifdef _DEBUG
             , L"-Zi",                  // debug info optional
             L"-Qembed_debug"
@@ -79,12 +80,13 @@ namespace candle::rendering
         ComPtr<IDxcBlobUtf8> errors;
         result->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
 
-        if (errors && errors->GetStringLength() > 0)
-            printf("%s\n", errors->GetStringPointer());
+        if (errors && errors->GetStringLength() > 0) {
+            core::Logger::Log(core::LogType::Error, std::format("Loaded shader {}", errors->GetStringPointer()));
+        }
 
         result->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&m_ShaderBlob), nullptr);
 
-        std::cout << "Loaded shader " << shaderSourceFilePath << std::endl;
+        core::Logger::Log(core::LogType::Info, std::format("Loaded shader {}", shaderSourceFilePath));
     }
 
     void Shader::Release(){

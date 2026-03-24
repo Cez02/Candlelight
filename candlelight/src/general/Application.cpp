@@ -250,8 +250,6 @@ void candle::BeginLoop(const HApplication &application){
     MSG msg = {};
     while (msg.message != WM_QUIT)
     {
-        Logger::Log(LogType::Info, "Looping");
-
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             ::TranslateMessage(&msg);

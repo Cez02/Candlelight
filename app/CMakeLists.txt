@@ -14,3 +14,8 @@ target_link_libraries(candlelight_app
 )
 
 install(TARGETS candlelight_app DESTINATION bin)
+
+install(FILES
+        $<TARGET_RUNTIME_DLLS:candlelight_app>
+        DESTINATION bin
+)
