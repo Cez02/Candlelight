@@ -3,6 +3,7 @@
     "directx-headers",
     "directx-dxc",
     "glm",
-    "spdlog"
+    "spdlog",
+    "assimp"
   ]
 }

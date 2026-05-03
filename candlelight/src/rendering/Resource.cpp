@@ -40,6 +40,6 @@ namespace candle::rendering  {
     }
 
     void Resource::Release() {
-
+        m_Resource = nullptr;
     }
 } // candle

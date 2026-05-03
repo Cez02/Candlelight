@@ -2,13 +2,15 @@
 
 #include <d3d12.h>
 #include <wrl.h>
+
+#include "BaseRawObject.h"
 using namespace Microsoft::WRL;
 
 #include <memory>
 
 namespace candle::rendering  {
 
-    class Resource {
+    class Resource : public core::BaseRawObject {
     private:
 
         ComPtr<ID3D12Resource> m_Resource;

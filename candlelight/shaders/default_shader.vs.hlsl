@@ -1,7 +1,7 @@
 struct VertexPos
 {
     float3 position : POSITION;
-    float4 color : COLOR;
+    // float4 color : COLOR;
 };
 
 struct VertexShaderOutput
@@ -14,7 +14,7 @@ VertexShaderOutput main(VertexPos IN)
 {
     VertexShaderOutput OUT;
 
-    OUT.color = IN.color;
+    OUT.color = float4(1, 1, 1, 1);
     OUT.position = float4(IN.position, 1.0f);
 
     return OUT;

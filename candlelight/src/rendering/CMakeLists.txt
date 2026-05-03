@@ -1,5 +1,7 @@
 add_library(candlelight_rendering)
 
+add_subdirectory(renderers)
+
 target_link_libraries(candlelight_rendering
     PUBLIC
         candlelight_core

@@ -5,6 +5,7 @@
 #include "candlelight_types.h"
 #include "RenderingContext.h"
 #include "architecture/BaseObject.h"
+#include "renderers/MeshRenderer.h"
 using namespace Microsoft::WRL;
 
 #include <directx/d3d12.h>
@@ -57,9 +58,8 @@ namespace candle::rendering
         HD3D12Debug m_Debug;
 
         HRenderPipeline m_RenderPipeline;
-        HResource m_DynamicVertexBuffer;
 
-        D3D12_VERTEX_BUFFER_VIEW m_DynamicVBV;
+        HMeshRenderer m_ExampleMesh;
 
 
         // Methods

@@ -231,47 +231,35 @@ HRenderPipeline CreateRenderPipeline(ComPtr<ID3D12Device> device, RenderingConte
     return pipeline;
 }
 
-
-
-HResource CreateDynamicVertexBuffer(ComPtr<ID3D12Device> device){
-
-    HResource resource = std::make_shared<Resource>();
-
-    resource->Init(device, memory::Kbs2Bytes(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
-    resource->GetResource()->SetName(L"Dynamic vertex buffer");
-
-
-    // add test triangle
-
-    void* dest = nullptr;
-
-    resource->GetResource()->Map(0, 0, &dest);
-
-    // modify buffer HERE
-
-    float data[] = {
-        -0.5f, -0.5f, 0.0f,      // vertex 1
-        1.0f, 0.0f, 0.0f, 1.0f, // color
-
-        0.0f, 0.5f, 0.0f,      // vertex 2
-        0.0f, 1.0f, 0.0f, 1.0f, // color
-    
-        0.5f, -0.5f, 0.0f,      // vertex 3
-        0.0f, 0.0f, 1.0f, 1.0f, // color
+HMeshRenderer CreateExampleMesh(const RenderingContext &renderingContext) {
+    std::vector<glm::vec3> verticesRaw = {
+        { -0.5f, -0.5f, 0.0f },
+        { 0.0f, 0.5f, 0.0f },
+        { 0.5f, -0.5f, 0.0f }
     };
 
-	memcpy(dest, data, sizeof(data));
+    std::vector<Vertex> vertices;
 
-    resource->GetResource()->Unmap(0, 0);
+    for (int i = 0; i < verticesRaw.size(); i++) {
+        vertices.push_back(verticesRaw[i]);
+    }
 
-    return resource;
-}
+    std::vector<IndexTriangle> indexTriangles = {
+        {0, 1, 2}
+    };
 
-void SetupVBV(ComPtr<ID3D12Device> device, HResource resource, D3D12_VERTEX_BUFFER_VIEW &vertexBufferView){
 
-    vertexBufferView.BufferLocation = resource->GetResource()->GetGPUVirtualAddress();
-    vertexBufferView.StrideInBytes = sizeof(glm::vec3) + sizeof(glm::vec4); // todo: update with custom mesh API
-    vertexBufferView.SizeInBytes = memory::Kbs2Bytes(16);
+    HGenericMesh genericMesh = std::make_shared<GenericMesh>(
+        vertices,
+        indexTriangles
+    );
+
+    HMeshRenderer meshRenderer = std::make_shared<MeshRenderer>(
+        genericMesh,
+        renderingContext
+    );
+
+    return meshRenderer;
 }
 
 HD3D12Debug CreateDebug(){
@@ -353,8 +341,7 @@ void Renderer::InitFrameObjects(RendererInitSettings settings) {
 
     m_RenderPipeline = CreateRenderPipeline(m_RenderingContext.GetDevice(), m_RenderingContext);
 
-    m_DynamicVertexBuffer = CreateDynamicVertexBuffer(m_RenderingContext.GetDevice());
-    SetupVBV(m_RenderingContext.GetDevice(), m_DynamicVertexBuffer, m_DynamicVBV);
+    m_ExampleMesh = CreateExampleMesh(m_RenderingContext);
 
     UpdateRenderTargetViews(m_RenderingContext.GetDevice(), m_RenderingContext.GetSwapChain(), m_RenderingContext.GetRTVDescriptorHeap());
 }
@@ -382,11 +369,7 @@ void Renderer::DrawWithPipeline(ComPtr<ID3D12GraphicsCommandList2> commandList, 
     commandList->SetGraphicsRootSignature(m_RenderPipeline->GetRootSignature().Get());
     commandList->SetPipelineState(m_RenderPipeline->GetPipelineState().Get());
 
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    commandList->IASetVertexBuffers(0, 1, &m_DynamicVBV);
-
-    // draw call
-    commandList->DrawInstanced(3, 1, 0, 0);
+    m_ExampleMesh->Draw(commandList);
 }
 
 Renderer::Renderer(const BaseContext &context)
@@ -395,8 +378,7 @@ Renderer::Renderer(const BaseContext &context)
     , m_CurrentBackBufferIndex(0)
     , m_Viewport()
     , m_ScissorRect()
-    , m_FenceEvent(nullptr)
-    , m_DynamicVBV() {
+    , m_FenceEvent(nullptr) {
     memcpy(&m_RenderingContext, &context, sizeof(context));
 }
 
@@ -455,7 +437,6 @@ Renderer::~Renderer()
     m_RenderingContext.SetRTVDescriptorHeap(nullptr);
     m_RenderingContext.SetSwapChain(nullptr);
     m_CommandQueue = nullptr;
-    m_DynamicVertexBuffer = nullptr;
     m_RenderingContext.SetDevice(nullptr);
 
     m_RenderingContext.LockContext();

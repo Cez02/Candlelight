@@ -1,15 +1,16 @@
 #pragma once
+#include "BaseRawObject.h"
 
 namespace candle::core {
 
     template <class TContext>
-    class BaseObject {
+    class BaseObject : BaseRawObject {
         TContext m_Context;
 
         BaseObject() = default;
 
     public:
-        virtual ~BaseObject() = default;
+        ~BaseObject() override = default;
 
         explicit BaseObject(TContext context) { m_Context = context; }
 
