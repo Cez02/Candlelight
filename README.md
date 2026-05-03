@@ -13,16 +13,15 @@ The engine is split into:
 The ideal goals of the project:
 
 - Have a decoupled architecture where each element can be developed separately
-- Support modern rendering techniques and algorithms
+- Support modern `rendering techniques and algorithms
 - Learn to write and maintain large C++ projects
 - Decouple the project from windows and support other systems (along with Vulkan for rendering)
 
-### Current goals of the project
+###` Current goals of the project
 
-- Implement base architecture split and have it compile
-- Add asserts and debug logs
-    - replace ThrowIfFailed with DebugTools::AssertAndThrow
-- Clean up places where a service resolver should be used
+- Add an input manager
+- Add transform matrix uniforms for mesh manipulation
+- Add mesh texturing
 - Do not inherit contexts, only pass what is necessary in order not to blow up in scale
 
 
